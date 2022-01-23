@@ -45,4 +45,18 @@ router.post("/", (req, res) => {
   });
 });
 
+// router.post("/send", (req, res) => {
+//   //validate request
+//   const { uuid, emailTo, emailFrom } = req.body;
+//   if (!uuid || !emailTo || !emailFrom) {
+//     return res.status(422).send({ error: "All Fields Required." });
+//   }
+
+//   //get data from db
+//   const file = await file.findOne({ uuid: uuid });
+//   if (file.sender) {
+//     return res.status(422).send({ error: "email already sent" });
+//   }
+// });
+
 module.exports = router;

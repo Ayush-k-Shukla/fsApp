@@ -4,17 +4,17 @@
     <meta charset="UTF-8" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Download | InShare - File Sharing Made Easy</title>
+    <title>Download | FileSharingApp</title>
     <link rel="stylesheet" href="/css/style.css" />
   </head>
 
   <body>
-    <img src="/img/logo.png" alt="Inshare logo" class="logo" />
+    <img src="/img/logo.png" alt="logo" class="logo" />
 
     <section class="download">
       <img
         class="download__icon"
-        src="/img/download-sd.svg"
+        src="/img/download.png"
         alt="inshare-download"
       />
       <% if(locals.error){ %>
@@ -23,8 +23,8 @@
       <h2>Your file is ready to download</h2>
       <p>Link expires in 24 hours</p>
       <div class="download__meta">
-        <h4><%= fileName %></h4>
-        <small><%= parseInt(fileSize/1000) %> KB</small>
+        <h4><%= filename %></h4>
+        <small><%= parseInt(filesize/1000) %> KB</small>
       </div>
       <div class="send-btn-container">
         <a href="<%= downloadLink %>">Download file</a>
@@ -32,12 +32,11 @@
       <% } %>
     </section>
 
-    <!-- github fork button -->
     <a
-      href="https://github.com/codersgyan"
+      href="https://github.com/Ayush-k-Shukla"
       target="_blank"
       class="github-corner"
-      aria-label="View source on GitHub"
+      aria-label="developer's GitHub"
     >
       <svg
         width="80"
