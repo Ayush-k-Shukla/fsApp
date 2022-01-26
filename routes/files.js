@@ -2,7 +2,7 @@ const router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const File = require("../models/file");
-const { v4: uuid4 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const sendMail = require("../services/emailServices");
 const emailTemplate = require("../services/emailTemplate");
 
@@ -19,25 +19,27 @@ let storage = multer.diskStorage({
 
 let upload = multer({
   storage: storage,
-  limit: { fileSize: 1000000 * 100 }, //100mb approx
+  limits: { fileSize: 1000000 * 100 }, //100mb approx
 }).single("myfile");
 
 router.post("/", (req, res) => {
   //store file
   upload(req, res, async (err) => {
     //request validation
-    if (!req.file) {
-      return res.json({ error: "File can not be empty" });
-    }
     if (err) {
       return res.status(500).send({ error: err.message });
     }
+
+    // if (!req.file) {
+    //   return res.json({ error: "File can not be empty" });
+    // }
+
     //store into database
     const file = new File({
       filename: req.file.filename,
       path: req.file.path,
       size: req.file.size,
-      uuid: uuid4(),
+      uuid: uuidv4(),
     });
     console.log(file);
 
@@ -57,31 +59,32 @@ router.post("/send", async (req, res) => {
   }
 
   //get data from db
+  try {
+    const file = await File.findOne({ uuid: uuid });
+    if (file.sender) {
+      return res.status(422).send({ error: "email already sent." });
+    }
 
-  const file = await File.findOne({ uuid: uuid });
-  // if (file.sender) {
-  //   return res.status(422).send({ error: "email already sent." });
-  // }
+    file.sender = emailFrom;
+    file.receiver = emailTo;
+    const response = await file.save();
 
-  file.sender = emailFrom;
-  file.receiver = emailTo;
-  const response = await file.save();
-
-  //send email
-  sendMail({
-    from: emailFrom,
-    to: emailTo,
-    subject: "FileSharingApp",
-    text: `${emailFrom} has sent you a file`,
-    html: emailTemplate({
-      emailFrom: emailFrom,
-      downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
-      size: parseInt(file.size / 1000) + "KB",
-      expires: "24 Hours",
-    }),
-  });
-
-  return res.send({ success: true });
+    //send email
+    sendMail({
+      from: emailFrom,
+      to: emailTo,
+      subject: "FileSharingApp",
+      text: `${emailFrom} has sent you a file`,
+      html: emailTemplate({
+        emailFrom: emailFrom,
+        downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
+        size: parseInt(file.size / 1000) + "KB",
+        expires: "24 Hours",
+      }),
+    });
+  } catch (err) {
+    return res.status(500).send({ error: "Something went wrong" });
+  }
 });
 
 module.exports = router;
