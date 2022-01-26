@@ -39,6 +39,7 @@ router.post("/", (req, res) => {
       size: req.file.size,
       uuid: uuid4(),
     });
+    console.log(file);
 
     const response = await file.save();
     return res.json({
